@@ -1,0 +1,11 @@
+TurbineID	W2000-116-90
+Blade_root_U	D:\Shanghai-electricWork\post\extreme\main\Blade_root
+Hub_rotating_U	D:\Shanghai-electricWork\post\extreme\main\Hub_rotating
+Hub_stationary_U	D:\Shanghai-electricWork\post\extreme\main\Hub_stationary
+Tower_top_U	D:\Shanghai-electricWork\post\extreme\main\Tower_77.865
+Tower_base_U	D:\Shanghai-electricWork\post\extreme\main\Tower_1
+Blade_root_F	D:\Shanghai-electricWork\post\rainflow\main\main_1E8_7.0B\Blade_root
+Hub_rotor_F	D:\Shanghai-electricWork\post\rainflow\main\main_1E8_7.0B\Hub_rotating
+Hub_station_F	D:\Shanghai-electricWork\post\rainflow\main\main_1E8_7.0B\Hub_stationary
+Tower_top_F	D:\Shanghai-electricWork\post\rainflow\main\main_1E8_7.0B\Tower_station_77.865
+Tower_base_F	D:\Shanghai-electricWork\post\rainflow\main\main_1E8_7.0B\Tower_station_1
