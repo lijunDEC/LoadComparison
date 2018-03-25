@@ -66,7 +66,7 @@ namespace LoadComparison
             {
                 if(buff[i] == '\t')
                 {
-                    dlcPathTemp = buff.Substring(i + 1, endPos - i - 1);
+                    dlcPathTemp = buff.Substring(i + 1, endPos - i);
                     break;
                 }
             }

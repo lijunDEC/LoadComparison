@@ -62,6 +62,13 @@ namespace LoadComparison
                         }
                         //数据放入excel表中
                         rData.Value = com.resultMatrix;
+
+                        //转化为数字，将>1.05的数值标红
+                        Excel.Range numData = ws.get_Range(ws.Cells[row-8, col + 4], ws.Cells[row, col + 4]);
+                        numData.FormulaR1C1 = "1";
+                        Excel.FormatCondition condition1 = (Excel.FormatCondition)numData.FormatConditions.Add(Excel.XlFormatConditionType.xlCellValue, Excel.XlFormatConditionOperator.xlGreater, "1.05", Type.Missing);
+                        condition1.Interior.Color = 13551615;
+
                         row++;
                         comNum++;
                     }
@@ -81,11 +88,11 @@ namespace LoadComparison
             else
             {
                 int colStart = 1;
-                int colCount = 12;
+                int colCount = 4;
                 foreach (BladedData b in bladedDatas)
                 {
                     int rowStart = 1;
-                    int rowCount = 10;
+                    int rowCount = 6;
                     //机组名称
                     Excel.Range rb = ws.get_Range(ws.Cells[rowStart, colStart], ws.Cells[rowStart++, colStart + colCount]);
                     rb.Merge();
@@ -98,7 +105,6 @@ namespace LoadComparison
                         Excel.Range rHeader = ws.get_Range(ws.Cells[rowStart, colStart], ws.Cells[rowStart++, colStart + colCount]);
                         rHeader.Merge();
                         rHeader.Value = com.name;
-                        Excel.Range rData = ws.get_Range(ws.Cells[rowStart, colStart], ws.Cells[(rowStart = rowStart + rowCount), colStart + colCount]);
                         
                         for (int i = 0; i < 10; i++)
                         {
@@ -110,8 +116,33 @@ namespace LoadComparison
                                 com.resultMatrix[i + 1,  j + 7] = divValue;
                             }
                         }
-                        //数据放入excel表中
-                        rData.Value = com.resultMatrix;
+                        //只输出m=4&&m=10
+                        string[,] tempMatrix = new string[7, 5];
+                        for(int i=0; i<7; i++)
+                        {
+                            tempMatrix[i, 0] = com.resultMatrix[0, i];
+                            tempMatrix[i , 1] = com.resultMatrix[2, i];
+                            tempMatrix[i, 2] = com.resultMatrix[8, i];
+                            if(i == 0)
+                            {
+                                tempMatrix[i, 3] = com.resultMatrix[2, 0];
+                                tempMatrix[i, 4] = com.resultMatrix[8, 0];
+                            }
+                            else
+                            {
+                                tempMatrix[i, 3] = com.resultMatrix[2, i + 6];
+                                tempMatrix[i, 4] = com.resultMatrix[8, i + 6];
+                            }
+                        }
+                        Excel.Range rData = ws.get_Range(ws.Cells[rowStart, colStart], ws.Cells[(rowStart = rowStart + rowCount), colStart + colCount]);
+                        rData.Value = tempMatrix;
+
+                        //转化为数字，将>1.05的数值标红
+                        Excel.Range numData = ws.get_Range(ws.Cells[rowStart + 1 - rowCount, colStart + 3], ws.Cells[rowStart, colStart + colCount]);
+                        numData.FormulaR1C1 = "1";
+                        Excel.FormatCondition condition1 = (Excel.FormatCondition)numData.FormatConditions.Add(Excel.XlFormatConditionType.xlCellValue, Excel.XlFormatConditionOperator.xlGreater, "1.05", Type.Missing);
+                        condition1.Interior.Color = 13551615;
+
                         rowStart = rowStart + 2;
                         comNum++;
                     }
@@ -125,11 +156,6 @@ namespace LoadComparison
             Excel.Worksheet ws = (Excel.Worksheet)wb.Worksheets.Add();
         }
 
-//    Excel.Range r = ws.get_Range("A1", "H1");
-//    object[] objHeader = {"标题1","标题2","标题3",
-//"标题4","标题5","标题6",
-//"标题7","标题8"};
-//    r.Value = objHeader;
 
         void GetDataFromBladedResults()
         {
