@@ -35,44 +35,45 @@ namespace LoadComparison
             }
             else
             {
-                int col = 1; 
+                int col = 0;
+                int colCount = 5;
                 foreach (BladedData b in bladedDatas)
                 {
-                    int row = 1;
+                    int row = 0;
+                    int rowCount = 10;
                     //机组名称
-                    Excel.Range rb = ws.get_Range(ws.Cells[row, col], ws.Cells[row++, col+4]);
+                    Excel.Range rb = ws.get_Range(ws.Cells[row + 1, col + 1], ws.Cells[row+1, col+colCount]);
                     rb.Merge();
                     rb.Value = b.turbineMainCompenontResult.turbineID;
                     //主要部件名称和数据
                     var comBase = bladedDatas[0].turbineMainCompenontResult.results.ultmateData.component;
-                    var comNum = 0;
                     foreach (var com in b.turbineMainCompenontResult.results.ultmateData.component)
                     {
-                        Excel.Range rHeader = ws.get_Range(ws.Cells[row, col], ws.Cells[row++, col+4]);
+                        Excel.Range rHeader = ws.get_Range(ws.Cells[row + 2, col+1], ws.Cells[row+2, col+colCount]); //主要部件名称
                         rHeader.Merge();
                         rHeader.Value = com.name;
-                        Excel.Range rData = ws.get_Range(ws.Cells[row, col], ws.Cells[(row = row+8), col+4]);
-                        //计算对比值
+                        Excel.Range rHeade1 = ws.get_Range(ws.Cells[row + 3, col + 2], ws.Cells[row + 3, col + colCount]); //主要部件名称
+                        rHeade1.Value = new string[4] { "DLC", "Value", "Path", "Div" };
+                        //数据放入excel表中
+                        Excel.Range rData = ws.get_Range(ws.Cells[row+4, col + 1], ws.Cells[(row+4+rowCount-2), col + colCount]);
+                        
+                        rData.Value = com.resultMatrix;
                         for (int i = 0; i < 8; i++)
                         {
-                            var baseValue = Convert.ToSingle(comBase[comNum].resultMatrix[i, 2]);
-                            var compValue = Convert.ToSingle(com.resultMatrix[i, 2]);
-                            var divValue = (compValue / baseValue).ToString(".000");
-                            com.resultMatrix[i, 4] = divValue;
+                            string basediv = String.Format("R{0}C{1}", (row + 4 + i), 3);
+                            string div = String.Format("R{0}C{1}", (row + 4 + i), col + 3);
+                            Excel.Range comP = ws.get_Range(ws.Cells[row + 4 + i, col + colCount], ws.Cells[row + 4 + i, col + colCount]);
+                            comP.FormulaR1C1 = "=" + div + "/" + basediv;
                         }
-                        //数据放入excel表中
-                        rData.Value = com.resultMatrix;
-
+                        Excel.Range formatCell = ws.get_Range(ws.Cells[row + 1, col + 1], ws.Cells[row + rowCount +1, col + colCount]);
+                        formatCell.HorizontalAlignment = Excel.XlHAlign.xlHAlignLeft;
                         //转化为数字，将>1.05的数值标红
-                        Excel.Range numData = ws.get_Range(ws.Cells[row-8, col + 4], ws.Cells[row, col + 4]);
-                        numData.FormulaR1C1 = "1";
+                        Excel.Range numData = ws.get_Range(ws.Cells[row + 4 , col + colCount], ws.Cells[row + 4 + rowCount-2, col + colCount]);
                         Excel.FormatCondition condition1 = (Excel.FormatCondition)numData.FormatConditions.Add(Excel.XlFormatConditionType.xlCellValue, Excel.XlFormatConditionOperator.xlGreater, "1.05", Type.Missing);
                         condition1.Interior.Color = 13551615;
-
-                        row++;
-                        comNum++;
+                        row = row + rowCount + 1;
                     }
-                    col = col + 6;
+                    col = col + colCount + 1;
                 }
             }
         }
@@ -91,9 +92,8 @@ namespace LoadComparison
                 foreach (BladedData b in bladedDatas)
                 {
                     int rowStart = 1;
-                    int rowCount = 6;
                     //机组名称
-                    Excel.Range rb = ws.get_Range(ws.Cells[rowStart, colStart], ws.Cells[rowStart++, colStart + colCount]);
+                    Excel.Range rb = ws.get_Range(ws.Cells[rowStart, colStart], ws.Cells[rowStart, colStart + colCount-1]);
                     rb.Merge();
                     rb.Value = b.turbineMainCompenontResult.turbineID;
                     //主要部件名称和数据
@@ -101,51 +101,64 @@ namespace LoadComparison
                     var comNum = 0;
                     foreach (var com in b.turbineMainCompenontResult.results.equivalentFatigueData.component)
                     {
-                        Excel.Range rHeader = ws.get_Range(ws.Cells[rowStart, colStart], ws.Cells[rowStart++, colStart + colCount]);
+                        Excel.Range rHeader = ws.get_Range(ws.Cells[rowStart + 1, colStart ], ws.Cells[rowStart+ 1, colStart + colCount-1]);
                         rHeader.Merge();
                         rHeader.Value = com.name;
                         
-                        for (int i = 0; i < 10; i++)
-                        {
-                            for(int j= 0; j< 6; j++ )
-                            {
-                                var baseValue = Convert.ToSingle(comBase[comNum].resultMatrix[i+1, j+1]);
-                                var compValue = Convert.ToSingle(com.resultMatrix[i + 1, j + 1]);
-                                var divValue = (compValue / baseValue).ToString("G3");
-                                com.resultMatrix[i + 1,  j + 7] = divValue;
-                            }
-                        }
+
                         //只输出m=4&&m=10
                         string[,] tempMatrix = new string[7, 5];
                         for(int i=0; i<7; i++)
                         {
-                            tempMatrix[i, 0] = com.resultMatrix[0, i];
-                            tempMatrix[i , 1] = com.resultMatrix[2, i];
+                            tempMatrix[i, 0] = com.resultMatrix[0, i];   //表头
+                            tempMatrix[i , 1] = com.resultMatrix[2, i];  //
                             tempMatrix[i, 2] = com.resultMatrix[8, i];
                             if(i == 0)
                             {
                                 tempMatrix[i, 3] = com.resultMatrix[2, 0];
                                 tempMatrix[i, 4] = com.resultMatrix[8, 0];
                             }
-                            else
-                            {
-                                tempMatrix[i, 3] = com.resultMatrix[2, i + 6];
-                                tempMatrix[i, 4] = com.resultMatrix[8, i + 6];
-                            }
                         }
-                        Excel.Range rData = ws.get_Range(ws.Cells[rowStart, colStart], ws.Cells[(rowStart = rowStart + rowCount), colStart + colCount]);
-                        rData.Value = tempMatrix;
+                        //变换输出格式
+                        Excel.Range header1;
+                        for (int i = 0; i<6; i++)
+                        {
+                            header1 = ws.get_Range(ws.Cells[rowStart + 3 + i * 2, colStart], ws.Cells[rowStart + 3 + i * 2 + 1, colStart]);
+                            header1.Merge();
+                            header1.Value = tempMatrix[i+ 1, 0]; ;
+                        }
+                        //列表头
+                        string[] headerCol = { "m", "Value", "Div" };
+                        Excel.Range header2 = ws.get_Range(ws.Cells[rowStart+ 2, colStart+ 1], ws.Cells[rowStart + 2, colStart + colCount - 1]);
+                        header2.Value = headerCol;
+                        //数据矩阵
+                        float[,] dataMatrixTemp = new float[12, 3];
+                        for(int i =0; i< 6; i++)
+                        {
+                            dataMatrixTemp[2*i, 0] = 4;
+                            dataMatrixTemp[2 * i + 1, 0] = 6;
+                            dataMatrixTemp[2*i, 1] = Convert.ToSingle(tempMatrix[i+ 1, 1]);
+                            dataMatrixTemp[2 * i + 1, 1] = Convert.ToSingle(tempMatrix[i + 1, 2]);
+                        }
+                        Excel.Range rData = ws.get_Range(ws.Cells[rowStart + 3, colStart + 1], ws.Cells[rowStart + 14, colStart + 2]);
+                        rData.Value = dataMatrixTemp;
 
+                        for(int i=0; i<12; i++)
+                        {
+                            string basediv = String.Format("R{0}C{1}", (rowStart + 3 + i), 3);
+                            string div = String.Format("R{0}C{1}", (rowStart + 3 + i), colStart + 2);
+                            Excel.Range comP = ws.get_Range(ws.Cells[rowStart + 3 + i, colStart + 3], ws.Cells[rowStart + 3+i, colStart + 3]);
+                            comP.FormulaR1C1 = "=" + div + "/" + basediv;
+                        }
+                        Excel.Range formatCell = ws.get_Range(ws.Cells[rowStart, colStart], ws.Cells[rowStart+15, colStart + colCount]);
+                        formatCell.HorizontalAlignment = Excel.XlHAlign.xlHAlignLeft;
                         //转化为数字，将>1.05的数值标红
-                        Excel.Range numData = ws.get_Range(ws.Cells[rowStart + 1 - rowCount, colStart + 3], ws.Cells[rowStart, colStart + colCount]);
-                        numData.FormulaR1C1 = "1";
+                        Excel.Range numData = ws.get_Range(ws.Cells[rowStart +3, colStart + colCount - 1], ws.Cells[rowStart+ 14, colStart + colCount-1]);
                         Excel.FormatCondition condition1 = (Excel.FormatCondition)numData.FormatConditions.Add(Excel.XlFormatConditionType.xlCellValue, Excel.XlFormatConditionOperator.xlGreater, "1.05", Type.Missing);
                         condition1.Interior.Color = 13551615;
-
-                        rowStart = rowStart + 2;
-                        comNum++;
+                        rowStart = rowStart + 15;
                     }
-                    colStart = colStart + colCount + 2;
+                    colStart = colStart + 5;
                 }
             }
         }
@@ -194,6 +207,9 @@ namespace LoadComparison
                         //数据放入excel表中
                         Excel.Range rData = ws.get_Range(ws.Cells[(row + 3), col + 1], ws.Cells[(row + 3 + rowCount-1), col+colCount]);
                         rData.Value = com.dlcMaxValueList;
+                        //对齐设置
+                        Excel.Range formatCell = ws.get_Range(ws.Cells[row, col], ws.Cells[row + 3 + rowCount, col + 18]);
+                        formatCell.HorizontalAlignment = Excel.XlHAlign.xlHAlignLeft;
                         ////色阶设置
                         Excel.Range numData = ws.get_Range(ws.Cells[(row + 3), col + 1], ws.Cells[(row + 3 + rowCount - 1), col + colCount]);
                         //numData.FormulaR1C1 = "1";
@@ -208,6 +224,7 @@ namespace LoadComparison
                         condition1.ColorScaleCriteria.Item[3].Type = Excel.XlConditionValueTypes.xlConditionValueHighestValue;
                         condition1.ColorScaleCriteria.Item[3].FormatColor.Color = 7039480;
                         row = row + 3 + rowCount +1;
+
                     }
                     col = col + 18;
                 }
