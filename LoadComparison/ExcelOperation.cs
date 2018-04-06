@@ -75,7 +75,6 @@ namespace LoadComparison
                     col = col + 6;
                 }
             }
-            SaveAsExcelFile(bladedDatas[0]);
         }
 
         public void CreateMainEequivalentFatigueLoadsSheet()
@@ -156,6 +155,65 @@ namespace LoadComparison
             Excel.Worksheet ws = (Excel.Worksheet)wb.Worksheets.Add();
         }
 
+        public void CreateMainUltimateLoadsThermodynamicChartSheet()    //创建热力图
+        {
+            Excel.Worksheet ws = (Excel.Worksheet)wb.Worksheets["UltimateThermodynamicChart"];
+//             Excel.Worksheet ws = (Excel.Worksheet)wb.Worksheets.Add(Type.Missing, wsTemp, Type.Missing, Type.Missing);
+//             ws.Name = "UltimateThermodynamicChart";
+            if (bladedDatas.Count < 1)
+            {
+                Console.WriteLine("CreateMainUltimateLoadsSheet-bladedDatas.Count < 1 error!");
+            }
+            else
+            {
+                int col = 1;
+                int colCount = 0;
+                foreach (BladedData b in bladedDatas)
+                {
+                    int row = 1;
+                    //机组名称
+                    Excel.Range rb = ws.get_Range(ws.Cells[row, col], ws.Cells[row, col + 4]);
+                    rb.Merge();
+                    rb.Value = b.turbineMainCompenontResult.turbineID;
+                    //主要部件名称和数据
+ //                   var comBase = bladedDatas[0].turbineMainCompenontResult.results.ultmateData.component;
+                    foreach (var com in b.turbineMainCompenontResult.results.ultmateData.component)
+                    {
+                        //部件名称
+                        Excel.Range rHeader = ws.get_Range(ws.Cells[row + 1, col], ws.Cells[row+1, col + 4]);
+                        rHeader.Merge();
+                        rHeader.Value = com.name;
+                        colCount = com.mainDlcData.Count ;  //数据 
+                        int rowCount = com.variableHeader.Length;
+                        //列表头
+                        Excel.Range rHeadercol = ws.get_Range(ws.Cells[row+2, col + 1], ws.Cells[row + 2, col + colCount]);
+                        rHeadercol.Value = com.dlcNameList.ToArray();
+                        //行表头
+                        Excel.Range rHeaderrow = ws.get_Range(ws.Cells[(row + 3), col], ws.Cells[(row+3+ rowCount-1), col]);
+                        rHeaderrow.Value = com.variableHeader;
+                        //数据放入excel表中
+                        Excel.Range rData = ws.get_Range(ws.Cells[(row + 3), col + 1], ws.Cells[(row + 3 + rowCount-1), col+colCount]);
+                        rData.Value = com.dlcMaxValueList;
+                        ////色阶设置
+                        Excel.Range numData = ws.get_Range(ws.Cells[(row + 3), col + 1], ws.Cells[(row + 3 + rowCount - 1), col + colCount]);
+                        //numData.FormulaR1C1 = "1";
+                        Excel.ColorScale condition1 = (Excel.ColorScale)numData.FormatConditions.AddColorScale(3);
+                        condition1.SetFirstPriority();
+                        Excel.ColorScaleCriterion colorScaleCriterion = condition1.ColorScaleCriteria.Item[1];
+                        condition1.ColorScaleCriteria.Item[1].Type = Microsoft.Office.Interop.Excel.XlConditionValueTypes.xlConditionValueLowestValue;
+                        condition1.ColorScaleCriteria.Item[1].FormatColor.Color = 8109667;
+                        condition1.ColorScaleCriteria.Item[2].Type = Excel.XlConditionValueTypes.xlConditionValuePercentile;
+                        condition1.ColorScaleCriteria.Item[2].Value = 50;
+                        condition1.ColorScaleCriteria.Item[2].FormatColor.Color = 8711167;
+                        condition1.ColorScaleCriteria.Item[3].Type = Excel.XlConditionValueTypes.xlConditionValueHighestValue;
+                        condition1.ColorScaleCriteria.Item[3].FormatColor.Color = 7039480;
+                        row = row + 3 + rowCount +1;
+                    }
+                    col = col + 18;
+                }
+            }
+            SaveAsExcelFile(bladedDatas[0]);
+        }
 
         void GetDataFromBladedResults()
         {
@@ -197,7 +255,7 @@ namespace LoadComparison
             GetMainComPathFromPostPath();
         }
 
-        void GetMainComPathFromPostPath()
+        void GetMainComPathFromPostPath() // 从excel表中获取post路径
         {
             foreach(BladedData dd in bladedDatas)
             {
@@ -229,9 +287,9 @@ namespace LoadComparison
         void SaveAsExcelFile(BladedData b)
         {
             var dir = Directory.GetCurrentDirectory();
-            var filePath = dir +"\\"+ b.turbineMainCompenontResult.turbineID + "-" + "Comparison" + DateTime.Today.ToString("yyyyMMdd");
+            var filePath = dir +"\\"+ b.turbineMainCompenontResult.turbineID + "-" + "Comparison" + DateTime.Today.ToString("yyyyMMdd") + ".xlsx";
             wb.SaveAs(filePath);
-            app.Quit();
+//            app.Quit();
         }
 
         public void QuitExcel()

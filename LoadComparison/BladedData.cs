@@ -121,8 +121,19 @@ namespace LoadComparison
                 public class MainComponentDataStruct
                 {
                     public string name;
+                    public string[,] variableHeader;//Mx, My, ...
                     public string path;
                     public string[,] resultMatrix;
+                    public List<string> dlcNameList;
+                    public float[,] dlcMaxValueList;
+                    public List<MainDlcDataStruct> mainDlcData;
+                }
+                public class MainDlcDataStruct
+
+                {
+                    public string dlcName;
+
+                    public float[,] resultMatrix; 
                 }
             }
         }

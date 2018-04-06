@@ -14,14 +14,15 @@ namespace LoadComparison
         static void Main(string[] args)
         {
             ExcelOperation excelOperation = new ExcelOperation();
-            try
+//            try
             {
                 excelOperation.CreateMainEequivalentFatigueLoadsSheet();
                 excelOperation.CreateMainUltimateLoadsSheet();
+                excelOperation.CreateMainUltimateLoadsThermodynamicChartSheet();
             }
-            catch
+//            catch
             {
-                excelOperation.QuitExcel();
+  //              excelOperation.QuitExcel();
             }
         }
 
