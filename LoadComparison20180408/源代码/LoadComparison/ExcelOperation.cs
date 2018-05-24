@@ -135,7 +135,7 @@ namespace LoadComparison
                         for(int i =0; i< 6; i++)
                         {
                             dataMatrixTemp[2*i, 0] = 4;
-                            dataMatrixTemp[2 * i + 1, 0] = 10;
+                            dataMatrixTemp[2 * i + 1, 0] = 6;
                             dataMatrixTemp[2*i, 1] = Convert.ToSingle(tempMatrix[i+ 1, 1]);
                             dataMatrixTemp[2 * i + 1, 1] = Convert.ToSingle(tempMatrix[i + 1, 2]);
                         }
@@ -160,6 +160,11 @@ namespace LoadComparison
                     colStart = colStart + 5;
                 }
             }
+        }
+
+            void CreateMainEquivalentFatigueLoadsSheet()
+        {
+            Excel.Worksheet ws = (Excel.Worksheet)wb.Worksheets.Add();
         }
 
         public void CreateMainUltimateLoadsThermodynamicChartSheet()    //创建热力图
@@ -190,7 +195,7 @@ namespace LoadComparison
                         Excel.Range rHeader = ws.get_Range(ws.Cells[row + 1, col], ws.Cells[row+1, col + 4]);
                         rHeader.Merge();
                         rHeader.Value = com.name;
-                        colCount = com.mainDlcData.Count ;  //数据
+                        colCount = com.mainDlcData.Count ;  //数据 
                         int rowCount = com.variableHeader.Length;
                         //列表头
                         Excel.Range rHeadercol = ws.get_Range(ws.Cells[row+2, col + 1], ws.Cells[row + 2, col + colCount]);
@@ -226,13 +231,12 @@ namespace LoadComparison
             SaveAsExcelFile(bladedDatas[0]);
         }
 
-        void GetDataFromBladedResults() // Get formative matrix From bladed post 
+        void GetDataFromBladedResults()
         {
             this.GetPostPathFromInfoSheet();
             bladedDatas = bladedDataOperation.GetMainCompinentLoadsResult(bladedDatas);
         }
-
-        void InitialExcelSetting() //Open excel file
+        void InitialExcelSetting()
         {
             if (app == null)
             {
@@ -271,8 +275,7 @@ namespace LoadComparison
         {
             foreach(BladedData dd in bladedDatas)
             {
-                var comPaths = Directory.GetDirectories(dd.ultimateLoads.path).ToList<string>();
-                comPaths.Sort();
+                string[] comPaths = Directory.GetDirectories(dd.ultimateLoads.path);
                 foreach(string s in comPaths)
                 {
                     BladedData.TurbineMainCompenontResult.Results.MainComponentDataStruct com
@@ -283,8 +286,7 @@ namespace LoadComparison
                     dd.turbineMainCompenontResult.results.ultmateData.component.Add(com);
                 }
 
-                var comPaths2 = Directory.GetDirectories(dd.equivalentFatigueLoads.path).ToList<string>();
-                comPaths2.Sort();
+                string[] comPaths2 = Directory.GetDirectories(dd.equivalentFatigueLoads.path);
                 foreach (string s in comPaths2)
                 {
                     BladedData.TurbineMainCompenontResult.Results.MainComponentDataStruct com
@@ -298,7 +300,7 @@ namespace LoadComparison
             bladedDataOperation.GetMainCompinentLoadsResult(bladedDatas);
         }
 
-        void SaveAsExcelFile(BladedData b) //save excel file as a new name
+        void SaveAsExcelFile(BladedData b)
         {
             var dir = Directory.GetCurrentDirectory();
             var filePath = dir +"\\"+ b.turbineMainCompenontResult.turbineID + "-" + "Comparison" + DateTime.Today.ToString("yyyyMMdd") + ".xlsx";

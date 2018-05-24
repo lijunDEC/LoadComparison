@@ -4,4 +4,7 @@ d:\visual_studio_2015\Projects\LoadComparison\LoadComparison\bin\Debug\LoadCompa
 d:\visual_studio_2015\Projects\LoadComparison\LoadComparison\obj\Debug\LoadComparison.exe
 d:\visual_studio_2015\Projects\LoadComparison\LoadComparison\obj\Debug\LoadComparison.pdb
 d:\visual_studio_2015\Projects\LoadComparison\LoadComparison\bin\Debug\stdole.dll
-D:\visual_studio_2015\Projects\LoadComparison\LoadComparison\obj\Debug\LoadComparison.csprojResolveAssemblyReference.cache
+d:\visual_studio_2015\Projects\LoadComparison\LoadComparison\obj\Debug\LoadComparison.csprojResolveAssemblyReference.cache
+D:\visual_studio_2015\Projects\LoadComparison\LoadComparison20180408\源代码\LoadComparison\bin\Debug\LoadComparison.exe.config
+D:\visual_studio_2015\Projects\LoadComparison\LoadComparison20180408\源代码\LoadComparison\obj\Debug\LoadComparison.exe
+D:\visual_studio_2015\Projects\LoadComparison\LoadComparison20180408\源代码\LoadComparison\obj\Debug\LoadComparison.pdb

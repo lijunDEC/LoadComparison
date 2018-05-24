@@ -38,10 +38,10 @@ namespace LoadComparison
             switch (mode)
             {
                 case 0:
-                    result.ultimateLoads = GetUltimateLoadsResultsFromMxFile(filePath).ultimateLoads;
+                    result.ultimateLoads = GetUltimateLoadsResultsFromFile(filePath).ultimateLoads;
                     break;
                 case 1:
-                    result.equivalentFatigueLoads = GetEquivalentFatigueLoadsResultsFromEqFile(filePath).equivalentFatigueLoads;
+                    result.equivalentFatigueLoads = GetEquivalentFatigueLoadsResultsFromFile(filePath).equivalentFatigueLoads;
                     break;
                 default:
                     Console.WriteLine("CheckBladedResultType error!");
@@ -58,7 +58,7 @@ namespace LoadComparison
                 return -1;
         }
 
-        private string GetBladedRunPath(string filePath, string dlcName) //get the dlc name from post .$PJ file
+        private string GetBladedRunPath(string filePath, string dlcName)
         {
             var pjFilePath = Directory.GetFiles(filePath, "*.$PJ")[0];  //获取.$pj文件路径
             var buff = File.ReadAllText(pjFilePath);
@@ -75,7 +75,7 @@ namespace LoadComparison
             return dlcPathTemp;
         }
 
-        private BladedData GetUltimateLoadsResultsFromMxFile(string filePath)
+        private BladedData GetUltimateLoadsResultsFromFile(string filePath)
         {
             BladedData ultimateLoadsResults = new BladedData();
             var pjFilePath = Directory.GetFiles(filePath, "*.$PJ")[0];  //获取.$pj文件路径
@@ -195,7 +195,7 @@ namespace LoadComparison
         }
 
 
-        private BladedData GetEquivalentFatigueLoadsResultsFromEqFile(string filePath) //从后处理文件夹中获取等效疲劳载荷数据
+        private BladedData GetEquivalentFatigueLoadsResultsFromFile(string filePath)
         {
             BladedData results = new BladedData();
             string[,] dataResults = new string[10, 6];
@@ -292,8 +292,7 @@ namespace LoadComparison
             }
         }
 
-        private string[] ComparisionStringNumValue(string filePath, string maxmum, string minmum,
-            string dlc1, string dlc2, string variable = "Mx")  //select the maxmum case
+        private string[] ComparisionStringNumValue(string filePath, string maxmum, string minmum, string dlc1, string dlc2, string variable = "Mx")
         {
             string[] col = new string[4];
             col[0] = variable;
@@ -314,6 +313,75 @@ namespace LoadComparison
                 return col;
             }
         }
+
+        //public string[,] GetFormatBladeRootUltimateLoadsResult(string filePath)
+        //{
+        //    return GetFormatUltimateLoadsResult(filePath, headerU1);
+        //}
+
+        //public string[,] GetFormatStationHubUltimateLoadsResult(string filePath)
+        //{
+        //    return GetFormatUltimateLoadsResult(filePath, headerU2);
+        //}
+
+        //public string[,] GetFormatRotorHubUltimateLoadsResult(string filePath)
+        //{
+        //    return GetFormatUltimateLoadsResult(filePath, headerU2);
+        //}
+
+        //public string[,] GetFormatTowerTopUltimateLoadsResult(string filePath)
+        //{
+        //    return GetFormatUltimateLoadsResult(filePath, headerU1);
+        //}
+
+        //public string[,] GetTowerBaseUltimateLoadResult(string filePath)
+        //{
+        //    return GetFormatUltimateLoadsResult(filePath, headerU1);
+        //}
+
+        //private string[,] GetFormatEquivalentFatigueLoadsResult(string filePath, string[] header)
+        //{
+        //    string[,] formatToExcelResult = new string[11, 7];
+        //    string[,] temp = GetEquivalentFatigueLoadsResultsFromFile(filePath).equivalentFatigueLoads.arrayResults;
+
+        //    for(int j=0; j<7; j++)//添加表头
+        //    {
+        //        formatToExcelResult[0, j] = header[j];
+        //    }
+        //    for(int i=0; i<7; i++)//添加内容
+        //    {
+        //        for(int j=0; j<10; j++)
+        //        {
+        //            formatToExcelResult[j + 1, i] = temp[j, i];
+        //        }
+        //    }
+        //    return formatToExcelResult;
+        //}
+
+        //public string[,] GetFormatBladedRootEquivalentFatigueLoadsResult(string filePath)
+        //{
+        //    return GetFormatEquivalentFatigueLoadsResult(filePath, headerF);
+        //}
+
+        //public string[,] GetFormatRotorHubEquivalentFatigueLoadsResult(string filePath)
+        //{
+        //    return GetFormatEquivalentFatigueLoadsResult(filePath, headerF);
+        //}
+
+        //public string[,] GetFormatStationHubEquivalentFatigueLoadsResult(string filePath)
+        //{
+        //    return GetFormatEquivalentFatigueLoadsResult(filePath, headerF);
+        //}
+
+        //public string[,] GetFormatTowerTopEquivalentFatigueLoadsResult(string filePath)
+        //{
+        //    return GetFormatEquivalentFatigueLoadsResult(filePath, headerF);
+        //}
+
+        //public string[,] GetFormatTowerBaseEquivalentFatigueLoadsResult(string filePath)
+        //{
+        //    return GetFormatEquivalentFatigueLoadsResult(filePath, headerF);
+        //}
 
         public List<BladedData> GetMainCompinentLoadsResult(List<BladedData> bladedPath)
         {
@@ -375,8 +443,7 @@ namespace LoadComparison
             BladedData.TurbineMainCompenontResult.Results.MainDlcDataStruct mainDlcData;
             List<BladedData.TurbineMainCompenontResult.Results.MainDlcDataStruct> mainDlcDataList = new List<BladedData.TurbineMainCompenontResult.Results.MainDlcDataStruct>();
             string pjName = Path.GetFullPath(Directory.GetFiles(mainCom.path, "*.$PJ")[0]).Replace(".$PJ", ".$MX");
-            List<string>dlcPath = Directory.GetFiles(mainCom.path, "*.$MX").ToList<string>();
-            dlcPath.Sort();
+            string[] dlcPath = Directory.GetFiles(mainCom.path, "*.$MX");
             dlcPathList = new List<string>();
             string sameDlc = null;
             int endFlag = 0;
@@ -401,7 +468,7 @@ namespace LoadComparison
                 }
                 else //塔架的命名分割与其他不同
                 {
-                    List<string> tempName = Path.GetFileNameWithoutExtension(ss).Split(new char[] { '-', '_' }, StringSplitOptions.RemoveEmptyEntries).ToList<string>();
+                    string[] tempName = Path.GetFileNameWithoutExtension(ss).Split(new char[] { '-', '_' }, StringSplitOptions.RemoveEmptyEntries);
                     string tempDlcName = tempName[0] + "_" + tempName[1];
                     if (string.IsNullOrEmpty(sameDlc)) sameDlc = tempDlcName;
                     else if (sameDlc == tempDlcName) dlcPathList.Add(ss);
@@ -417,7 +484,7 @@ namespace LoadComparison
                     }
                 }
                 ++endFlag;
-                if (dlcPath.Count== endFlag + 1) //文件遍历完后获取最后一部分数据+1为br.$MX
+                if (dlcPath.Length == endFlag + 1) //文件遍历完后获取最后一部分数据+1为br.$MX
                 {
                     mainDlcData = new BladedData.TurbineMainCompenontResult.Results.MainDlcDataStruct();
                     mainDlcData.resultMatrix = GetUltimateLoadsDlcMaxValueFromFile(dlcPathList);
